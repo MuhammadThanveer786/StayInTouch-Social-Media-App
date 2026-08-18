@@ -24,7 +24,7 @@ const app = express();
 
 const allowedOrigins = [
     'http://localhost:5173',
-    'https://YOUR-VERCEL-DOMAIN.vercel.app'
+    'https://stay-in-touch-social-media-app.vercel.app'
 ];
 
 const httpServer = createServer(app);
@@ -72,12 +72,8 @@ await connectDB();
 app.use(clerkMiddleware());
 
 app.use(express.json());
-
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'https://YOUR-VERCEL-DOMAIN.vercel.app'
-    ],
+    origin: allowedOrigins,
     credentials: true
 }));
 
