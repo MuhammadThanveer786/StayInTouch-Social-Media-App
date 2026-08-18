@@ -22,12 +22,18 @@ import { serve } from 'inngest/express';
 
 const app = express();
 
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://YOUR-VERCEL-DOMAIN.vercel.app'
+];
+
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: 'http://localhost:5173',
-        methods: ['GET', 'POST', 'PATCH']
+        origin: allowedOrigins,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true
     }
 });
 
@@ -66,7 +72,14 @@ await connectDB();
 app.use(clerkMiddleware());
 
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'https://YOUR-VERCEL-DOMAIN.vercel.app'
+    ],
+    credentials: true
+}));
 
 
 
