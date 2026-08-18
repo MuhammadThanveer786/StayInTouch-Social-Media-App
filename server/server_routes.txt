@@ -1,7 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 import 'dotenv/config';
 import { clerkMiddleware, getAuth, clerkClient } from '@clerk/express';
 
@@ -17,51 +15,9 @@ import ConnectionRequest from './models/ConnectionRequest.js';
 
 import { inngest, functions } from './inngest/index.js';
 import { serve } from 'inngest/express';
-
-
-
 const app = express();
 
-const httpServer = createServer(app);
-
-const io = new Server(httpServer, {
-    cors: {
-        origin: 'http://localhost:5173',
-        methods: ['GET', 'POST', 'PATCH']
-    }
-});
-
-
-// =========================================================
-// SOCKET.IO
-// =========================================================
-
-io.on('connection', (socket) => {
-
-    console.log(
-        'Socket.IO client connected:',
-        socket.id
-    );
-
-
-    socket.on('disconnect', () => {
-
-        console.log(
-            'Socket.IO client disconnected:',
-            socket.id
-        );
-
-    });
-
-});
-
-
-
 await connectDB();
-
-
-
-
 
 app.use(clerkMiddleware());
 
@@ -256,13 +212,10 @@ app.get('/api/users/me', async (req, res) => {
 
 
 
-// =========================================================
-// GET USER BY ID
-// =========================================================
 
+// Get a user by ID
 app.get('/api/users/:userId', async (req, res) => {
     try {
-
         const { isAuthenticated } = getAuth(req);
 
         if (!isAuthenticated) {
@@ -274,19 +227,9 @@ app.get('/api/users/:userId', async (req, res) => {
 
         const { userId } = req.params;
 
-
-        // =====================================================
-        // FETCH USER
-        // =====================================================
-
         const user = await User.findById(userId).select(
-            'full_name username profile_picture cover_photo bio location followers following connections createdAt'
+            'full_name username profile_picture bio'
         );
-
-
-        // =====================================================
-        // USER NOT FOUND
-        // =====================================================
 
         if (!user) {
             return res.status(404).json({
@@ -295,31 +238,21 @@ app.get('/api/users/:userId', async (req, res) => {
             });
         }
 
-
-        // =====================================================
-        // RESPONSE
-        // =====================================================
-
         res.json({
             success: true,
             user
         });
 
-
     } catch (error) {
-
-        console.error(
-            'Error fetching user by ID:',
-            error
-        );
+        console.error('Error fetching user by ID:', error);
 
         res.status(500).json({
             success: false,
             message: 'Failed to fetch user'
         });
-
     }
 });
+
 
 
 // Follow a user
@@ -779,13 +712,10 @@ app.get('/api/users', async (req, res) => {
 
 
 
-// =========================================================
-// UPDATE LOGGED-IN USER'S PROFILE
-// =========================================================
 
+// Update logged-in user's profile
 app.put('/api/users/profile', async (req, res) => {
     try {
-
         const { isAuthenticated, userId } = getAuth(req);
 
         if (!isAuthenticated) {
@@ -795,121 +725,59 @@ app.put('/api/users/profile', async (req, res) => {
             });
         }
 
-        const {
-            full_name,
-            username,
-            bio,
-            location,
-            profile_picture,
-            cover_photo
-        } = req.body;
+        const { full_name, username, bio, location } = req.body;
 
-
-        // =====================================================
-        // CHECK USERNAME AVAILABILITY
-        // =====================================================
-
+        // Check whether username is already used by another user
         if (username) {
-
             const existingUser = await User.findOne({
                 username,
                 _id: { $ne: userId }
             });
 
             if (existingUser) {
-
                 return res.status(400).json({
                     success: false,
                     message: 'Username is already taken'
                 });
-
             }
-
         }
 
-
-        // =====================================================
-        // BUILD UPDATE OBJECT
-        // =====================================================
-
-        const updateData = {
-
-            ...(full_name !== undefined && {
-                full_name
-            }),
-
-            ...(username !== undefined && {
-                username
-            }),
-
-            ...(bio !== undefined && {
-                bio
-            }),
-
-            ...(location !== undefined && {
-                location
-            }),
-
-            ...(profile_picture !== undefined && {
-                profile_picture
-            }),
-
-            ...(cover_photo !== undefined && {
-                cover_photo
-            })
-
-        };
-
-
-        // =====================================================
-        // UPDATE USER
-        // =====================================================
-
-        const updatedUser =
-            await User.findByIdAndUpdate(
-                userId,
-                updateData,
-                {
-                    new: true,
-                    runValidators: true
-                }
-            );
-
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                ...(full_name !== undefined && { full_name }),
+                ...(username !== undefined && { username }),
+                ...(bio !== undefined && { bio }),
+                ...(location !== undefined && { location })
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
 
         if (!updatedUser) {
-
             return res.status(404).json({
                 success: false,
                 message: 'User not found'
             });
-
         }
-
-
-        // =====================================================
-        // RESPONSE
-        // =====================================================
 
         res.json({
             success: true,
             user: updatedUser
         });
 
-
     } catch (error) {
-
-        console.error(
-            'Error updating profile:',
-            error
-        );
+        console.error('Error updating profile:', error);
 
         res.status(500).json({
             success: false,
             message: 'Failed to update profile'
         });
-
     }
 });
+
 
 
 
@@ -1931,703 +1799,3 @@ app.post('/api/messages', async (req, res) => {
         if (!receiver) {
             return res.status(404).json({
                 success: false,
-                message: 'Receiver user not found'
-            });
-        }
-
-
-        // Only connected users can send messages
-        const sender = await User.findById(userId);
-
-        if (!sender) {
-            return res.status(404).json({
-                success: false,
-                message: 'Sender user not found'
-            });
-        }
-
-        if (!sender.connections.includes(to_user_id)) {
-            return res.status(403).json({
-                success: false,
-                message: 'You can only message your connections'
-            });
-        }
-
-
-
-
-
-
-
-        // Validate message type
-        if (!['text', 'image'].includes(message_type)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid message type'
-            });
-        }
-
-
-        // Image message must have media URL
-        if (
-            message_type === 'image' &&
-            !media_url
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: 'Image URL is required'
-            });
-        }
-
-
-        // Create message
-        const message = await Message.create({
-
-            _id: crypto.randomUUID(),
-
-            from_user_id: userId,
-
-            to_user_id: to_user_id,
-
-            text:
-                message_type === 'text'
-                    ? text.trim()
-                    : '',
-
-            message_type,
-
-            media_url,
-
-            isRead: false
-
-        });
-
-
-        // Populate sender and receiver information
-        const populatedMessage =
-            await Message.findById(message._id)
-                .populate(
-                    'from_user_id',
-                    'full_name username profile_picture'
-                )
-                .populate(
-                    'to_user_id',
-                    'full_name username profile_picture'
-                );
-
-
-        res.status(201).json({
-            success: true,
-            message: populatedMessage
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            'Error sending message:',
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            message: 'Failed to send message'
-        });
-
-    }
-});
-
-
-
-
-
-
-
-// MARK MESSAGES AS READ
-app.patch('/api/messages/:userId/read', async (req, res) => {
-    try {
-
-        const { isAuthenticated, userId } = getAuth(req);
-
-        if (!isAuthenticated) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not authenticated'
-            });
-        }
-
-        const { userId: otherUserId } = req.params;
-
-        // Prevent marking your own conversation as read
-        if (otherUserId === userId) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid conversation'
-            });
-        }
-
-        // Check whether the other user exists
-        const otherUser = await User.findById(otherUserId);
-
-        if (!otherUser) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-        // Mark unread messages sent by the other user as read
-        const result = await Message.updateMany(
-            {
-                from_user_id: otherUserId,
-                to_user_id: userId,
-                isRead: false
-            },
-            {
-                $set: {
-                    isRead: true
-                }
-            }
-        );
-
-        res.json({
-            success: true,
-            message: 'Messages marked as read',
-            modifiedCount: result.modifiedCount
-        });
-
-    } catch (error) {
-
-        console.error(
-            'Error marking messages as read:',
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            message: 'Failed to mark messages as read'
-        });
-
-    }
-});
-
-
-
-
-
-// =========================================================
-// GET UNREAD MESSAGE COUNT
-// =========================================================
-
-app.get('/api/messages/unread-count', async (req, res) => {
-    try {
-
-        const { isAuthenticated, userId } = getAuth(req);
-
-        if (!isAuthenticated) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not authenticated'
-            });
-        }
-
-        const unreadCount = await Message.countDocuments({
-            to_user_id: userId,
-            isRead: false
-        });
-
-        res.json({
-            success: true,
-            unreadCount
-        });
-
-    } catch (error) {
-
-        console.error(
-            'Error fetching unread message count:',
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch unread message count'
-        });
-
-    }
-});
-
-
-
-
-
-
-
-
-
-
-// =========================================================
-// GET CONVERSATION
-// =========================================================
-
-app.get('/api/messages/:userId', async (req, res) => {
-    try {
-
-        const { isAuthenticated, userId } = getAuth(req);
-
-        if (!isAuthenticated) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not authenticated'
-            });
-        }
-
-
-        const { userId: otherUserId } = req.params;
-
-
-        // Prevent requesting conversation with yourself
-        if (otherUserId === userId) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid conversation'
-            });
-        }
-
-
-        // Check whether other user exists
-        const otherUser = await User.findById(
-            otherUserId
-        );
-
-        if (!otherUser) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-
-
-        // Only connections can view conversations
-        const currentUser = await User.findById(userId);
-
-        if (!currentUser) {
-            return res.status(404).json({
-                success: false,
-                message: 'Current user not found'
-            });
-        }
-
-        if (!currentUser.connections.includes(otherUserId)) {
-            return res.status(403).json({
-                success: false,
-                message: 'You can only view conversations with your connections'
-            });
-        }
-
-
-
-
-
-
-
-
-
-        // Get messages exchanged between both users
-        const messages = await Message.find({
-
-            $or: [
-
-                {
-                    from_user_id: userId,
-                    to_user_id: otherUserId
-                },
-
-                {
-                    from_user_id: otherUserId,
-                    to_user_id: userId
-                }
-
-            ]
-
-        })
-            .populate(
-                'from_user_id',
-                'full_name username profile_picture'
-            )
-            .populate(
-                'to_user_id',
-                'full_name username profile_picture'
-            )
-            .sort({
-                createdAt: 1
-            });
-
-
-        res.json({
-            success: true,
-            messages
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            'Error fetching messages:',
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch messages'
-        });
-
-    }
-});
-
-
-
-
-
-// =========================================================
-// CREATE STORY
-// =========================================================
-
-app.post('/api/stories', async (req, res) => {
-    try {
-
-        const { isAuthenticated, userId } = getAuth(req);
-
-        if (!isAuthenticated) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not authenticated'
-            });
-        }
-
-        const {
-            content = '',
-            media_type = 'text',
-            media_url = '',
-            background_color = '#4f46e5'
-        } = req.body;
-
-
-        // Validate media type
-
-        if (!['text', 'image', 'video'].includes(media_type)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid story media type'
-            });
-        }
-
-
-        // Text story must contain text
-
-        if (
-            media_type === 'text' &&
-            !content.trim()
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: 'Story text is required'
-            });
-        }
-
-
-        // Image/video story must contain media URL
-
-        if (
-            media_type !== 'text' &&
-            !media_url
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: 'Story media URL is required'
-            });
-        }
-
-
-        // Check user
-
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-
-        // Story expires after 24 hours
-
-        const expiresAt = new Date(
-            Date.now() + 24 * 60 * 60 * 1000
-        );
-
-
-        const story = await Story.create({
-
-            user_id: userId,
-
-            content:
-                media_type === 'text'
-                    ? content.trim()
-                    : '',
-
-            media_type,
-
-            media_url,
-
-            background_color,
-
-            expiresAt
-
-        });
-
-
-        // Populate user information
-
-        const populatedStory =
-            await Story.findById(story._id)
-                .populate(
-                    'user_id',
-                    'full_name username profile_picture'
-                );
-
-
-        // =========================================================
-        // REAL-TIME STORY CREATED EVENT
-        // =========================================================
-
-        const storyForClients = {
-            ...populatedStory.toObject(),
-
-            user: populatedStory.user_id,
-
-            // The creator has not viewed their own story
-            // through the viewer flow.
-            isViewed: false
-        };
-
-
-        io.emit(
-            'story:created',
-            storyForClients
-        );
-
-
-
-
-        res.status(201).json({
-            success: true,
-            story: storyForClients
-        });
-
-    } catch (error) {
-
-        console.error(
-            'Error creating story:',
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            message: 'Failed to create story'
-        });
-
-    }
-});
-
-
-
-
-
-
-
-// =========================================================
-// GET ACTIVE STORIES
-// =========================================================
-
-app.get('/api/stories', async (req, res) => {
-    try {
-
-        const { isAuthenticated, userId } = getAuth(req);
-
-        if (!isAuthenticated) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not authenticated'
-            });
-        }
-
-
-        const stories = await Story.find({
-            expiresAt: {
-                $gt: new Date()
-            }
-        })
-            .populate(
-                'user_id',
-                'full_name username profile_picture'
-            )
-            .sort({
-                createdAt: -1
-            });
-
-
-        const formattedStories = stories.map(
-            (story) => {
-
-                const storyObject =
-                    story.toObject();
-
-                return {
-                    ...storyObject,
-
-                    // User information
-                    user: story.user_id,
-
-                    // Whether the authenticated user
-                    // has viewed this story
-                    isViewed:
-                        story.viewedBy?.includes(
-                            userId
-                        ) || false
-                };
-
-            }
-        );
-
-
-        res.json({
-            success: true,
-            stories: formattedStories
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            'Error fetching stories:',
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch stories'
-        });
-
-    }
-});
-
-
-
-
-
-
-
-
-// =========================================================
-// MARK STORY AS VIEWED
-// =========================================================
-
-app.patch('/api/stories/:storyId/view', async (req, res) => {
-    try {
-
-        const { isAuthenticated, userId } = getAuth(req);
-
-        if (!isAuthenticated) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not authenticated'
-            });
-        }
-
-
-        const { storyId } = req.params;
-
-
-        // Find the story
-        const story = await Story.findById(storyId);
-
-        if (!story) {
-            return res.status(404).json({
-                success: false,
-                message: 'Story not found'
-            });
-        }
-
-
-        // Don't allow the story owner to be
-        // added as a viewer
-        if (story.user_id === userId) {
-            return res.json({
-                success: true,
-                message: 'Story owner does not need to mark story as viewed'
-            });
-        }
-
-
-        // Add current user only if they
-        // haven't viewed this story already
-        if (!story.viewedBy?.includes(userId)) {
-
-            story.viewedBy.push(userId);
-
-            await story.save();
-
-            // =========================================================
-            // REAL-TIME STORY VIEWED EVENT
-            // =========================================================
-
-            io.emit(
-                'story:viewed',
-                {
-                    storyId: story._id.toString(),
-                    userId
-                }
-            );
-
-        }
-
-
-        res.json({
-            success: true,
-            message: 'Story marked as viewed'
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            'Error marking story as viewed:',
-            error
-        );
-
-        res.status(500).json({
-            success: false,
-            message: 'Failed to mark story as viewed'
-        });
-
-    }
-});
-
-
-
-
-
-
-
-app.use('/api/inngest', serve({ client: inngest, functions }));
-
-const PORT = process.env.PORT || 4000;
-
-httpServer.listen(
-    PORT,
-    () => console.log(
-        `Server is running on port ${PORT}`
-    )
-);

@@ -9,6 +9,7 @@ import CreatePost from './pages/CreatePost'
 import Login from './pages/Login';
 import Feed from './pages/Feed';
 import {Toaster} from 'react-hot-toast'
+import Notifications from './pages/Notifications';
 
 import {useUser} from '@clerk/clerk-react'
 import Layout from './pages/Layout'
@@ -28,6 +29,7 @@ const App = () => {
         <Route path='profile/:profileId' element = {<Profile/>}/>
         <Route path='profile' element = {<Profile/>}/>
         <Route path='create-post' element = {<CreatePost/>}/>
+        <Route path='notifications' element={<Notifications/>}/>
 
         </Route>
       </Routes>

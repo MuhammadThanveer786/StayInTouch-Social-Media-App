@@ -1,12 +1,20 @@
 import mongoose from "mongoose";
 
-const connectDB = async () =>{
-  try{
-    mongoose.connection.on('connected',()=>console.log('Database connected'))
-    await mongoose.connect(`${process.env.MONGODB_URI}/StayINTouch`)
-  }catch (error){
-    console.log(error.message)
-  }
-}
+const connectDB = async () => {
+  try {
+    mongoose.connection.on("connected", () => {
+      console.log("Database connected");
+      console.log("Database name:", mongoose.connection.name);
+      console.log("Database host:", mongoose.connection.host);
+    });
 
-export default connectDB
+    await mongoose.connect(process.env.MONGODB_URI, {
+      dbName: "StayINTouch"
+    });
+
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+export default connectDB;
