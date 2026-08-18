@@ -31,7 +31,7 @@ const RecentMessages = () => {
       }
 
       const response = await fetch(
-        "http://localhost:4000/api/messages/recent",
+        "https://stayintouch-server.onrender.com/api/messages/recent",
         {
           headers: {
             Authorization: `Bearer ${token}`,

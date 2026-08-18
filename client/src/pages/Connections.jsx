@@ -41,7 +41,7 @@ const Connections = () => {
       const token = await getToken()
 
       const response = await fetch(
-        'http://localhost:4000/api/connections',
+        'https://stayintouch-server.onrender.com/api/connections',
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -86,7 +86,7 @@ const Connections = () => {
       const token = await getToken()
 
       const response = await fetch(
-        `http://localhost:4000/api/connections/${senderId}/accept`,
+        `https://stayintouch-server.onrender.com/api/connections/${senderId}/accept`,
         {
           method: 'PATCH',
           headers: {

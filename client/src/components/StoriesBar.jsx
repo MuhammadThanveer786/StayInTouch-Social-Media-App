@@ -143,7 +143,7 @@ const StoriesBar = () => {
 
         const response =
           await fetch(
-            "http://localhost:4000/api/stories",
+            "https://stayintouch-server.onrender.com/api/stories",
             {
               headers: {
                 Authorization:
@@ -280,7 +280,7 @@ const StoriesBar = () => {
 
 
     const socket =
-      io("http://localhost:4000", {
+      io("https://stayintouch-server.onrender.com", {
         transports: [
           "websocket",
           "polling"
@@ -501,7 +501,7 @@ const StoriesBar = () => {
 
               const response =
                 await fetch(
-                  `http://localhost:4000/api/stories/${story._id}/view`,
+                  `https://stayintouch-server.onrender.com/api/stories/${story._id}/view`,
                   {
                     method:
                       "PATCH",

@@ -18,7 +18,7 @@ const Discover = () => {
       const token = await getToken();
 
       const response = await fetch(
-        `http://localhost:4000/api/users?search=${encodeURIComponent(
+        `https://stayintouch-server.onrender.com/api/users?search=${encodeURIComponent(
           searchText
         )}`,
         {

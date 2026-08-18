@@ -42,7 +42,7 @@ const Messages = () => {
       // -----------------------------------------------------
 
       const response = await fetch(
-        'http://localhost:4000/api/connections',
+        'https://stayintouch-server.onrender.com/api/connections',
         {
           headers: {
             Authorization: `Bearer ${token}`,

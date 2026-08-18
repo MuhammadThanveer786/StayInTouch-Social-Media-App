@@ -43,7 +43,7 @@ const Profile = () => {
 
       if (profileId) {
         const userResponse = await fetch(
-          `http://localhost:4000/api/users/${profileId}`,
+          `https://stayintouch-server.onrender.com/api/users/${profileId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -69,7 +69,7 @@ const Profile = () => {
 
       else {
         const userResponse = await fetch(
-          "http://localhost:4000/api/users/me",
+          "https://stayintouch-server.onrender.com/api/users/me",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -100,7 +100,7 @@ const Profile = () => {
       // =====================================================
 
       const postsResponse = await fetch(
-        `http://localhost:4000/api/posts/user/${userId}`,
+        `https://stayintouch-server.onrender.com/api/posts/user/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

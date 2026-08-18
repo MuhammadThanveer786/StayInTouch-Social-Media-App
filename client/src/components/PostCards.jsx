@@ -146,7 +146,7 @@ const PostCards = ({ post, onDelete, onEdit }) => {
       const token = await getToken();
 
       const response = await fetch(
-        `http://localhost:4000/api/posts/${post._id}/like`,
+        `https://stayintouch-server.onrender.com/api/posts/${post._id}/like`,
         {
           method: 'POST',
 
@@ -200,7 +200,7 @@ const PostCards = ({ post, onDelete, onEdit }) => {
       setCommentsLoading(true);
 
       const response = await fetch(
-        `http://localhost:4000/api/comments/post/${post._id}`
+        `https://stayintouch-server.onrender.com/api/comments/post/${post._id}`
       );
 
 
@@ -293,7 +293,7 @@ const PostCards = ({ post, onDelete, onEdit }) => {
       const token = await getToken();
 
       const response = await fetch(
-        'http://localhost:4000/api/comments',
+        'https://stayintouch-server.onrender.com/api/comments',
         {
           method: 'POST',
 
@@ -403,7 +403,7 @@ const PostCards = ({ post, onDelete, onEdit }) => {
 
 
       const response = await fetch(
-        `http://localhost:4000/api/posts/${post._id}`,
+        `https://stayintouch-server.onrender.com/api/posts/${post._id}`,
         {
           method: 'DELETE',
 
@@ -481,7 +481,7 @@ const PostCards = ({ post, onDelete, onEdit }) => {
 
 
     const authResponse = await fetch(
-      'http://localhost:4000/api/imagekit/auth',
+      'https://stayintouch-server.onrender.com/api/imagekit/auth',
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -652,7 +652,7 @@ const PostCards = ({ post, onDelete, onEdit }) => {
 
 
       const response = await fetch(
-        `http://localhost:4000/api/posts/${post._id}`,
+        `https://stayintouch-server.onrender.com/api/posts/${post._id}`,
         {
           method: 'PUT',
 

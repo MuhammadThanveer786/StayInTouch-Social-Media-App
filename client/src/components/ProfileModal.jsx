@@ -53,7 +53,7 @@ const ProfileModal = ({
       // Get secure ImageKit credentials
 
       const authResponse = await fetch(
-        'http://localhost:4000/api/imagekit/auth',
+        'https://stayintouch-server.onrender.com/api/imagekit/auth',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -223,7 +223,7 @@ const ProfileModal = ({
       // =====================================================
 
       const response = await fetch(
-        'http://localhost:4000/api/users/profile',
+        'https://stayintouch-server.onrender.com/api/users/profile',
         {
           method: 'PUT',
 

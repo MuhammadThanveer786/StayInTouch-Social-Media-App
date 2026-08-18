@@ -30,7 +30,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       if (!token) return;
 
       const response = await fetch(
-        "http://localhost:4000/api/users/me",
+        "https://stayintouch-server.onrender.com/api/users/me",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       if (!token) return;
 
       const response = await fetch(
-        "http://localhost:4000/api/notifications/unread-count",
+        "https://stayintouch-server.onrender.com/api/notifications/unread-count",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       if (!token) return;
 
       const response = await fetch(
-        "http://localhost:4000/api/messages/unread-count",
+        "https://stayintouch-server.onrender.com/api/messages/unread-count",
         {
           headers: {
             Authorization: `Bearer ${token}`,

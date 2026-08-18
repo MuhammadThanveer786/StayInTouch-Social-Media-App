@@ -32,7 +32,7 @@ const Notifications = () => {
       const token = await getToken()
 
       const response = await fetch(
-        'http://localhost:4000/api/notifications',
+        'https://stayintouch-server.onrender.com/api/notifications',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ const Notifications = () => {
       const token = await getToken()
 
       const response = await fetch(
-        'http://localhost:4000/api/notifications/unread-count',
+        'https://stayintouch-server.onrender.com/api/notifications/unread-count',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -135,7 +135,7 @@ const Notifications = () => {
       const token = await getToken()
 
       const response = await fetch(
-        `http://localhost:4000/api/notifications/${notification._id}/read`,
+        `https://stayintouch-server.onrender.com/api/notifications/${notification._id}/read`,
         {
           method: 'PATCH',
           headers: {
@@ -194,7 +194,7 @@ const Notifications = () => {
       const token = await getToken()
 
       const response = await fetch(
-        'http://localhost:4000/api/notifications/read-all',
+        'https://stayintouch-server.onrender.com/api/notifications/read-all',
         {
           method: 'PATCH',
           headers: {

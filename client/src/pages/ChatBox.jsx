@@ -33,7 +33,7 @@ const ChatBox = () => {
       const token = await getToken()
 
       const response = await fetch(
-        `http://localhost:4000/api/users/${userId}`,
+        `https://stayintouch-server.onrender.com/api/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,7 +78,7 @@ const ChatBox = () => {
       const token = await getToken()
 
       const response = await fetch(
-        `http://localhost:4000/api/messages/${userId}`,
+        `https://stayintouch-server.onrender.com/api/messages/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -121,7 +121,7 @@ const ChatBox = () => {
       const token = await getToken()
 
       const response = await fetch(
-        `http://localhost:4000/api/messages/${userId}/read`,
+        `https://stayintouch-server.onrender.com/api/messages/${userId}/read`,
         {
           method: 'PATCH',
           headers: {
@@ -219,7 +219,7 @@ const ChatBox = () => {
 
       // Get secure ImageKit upload credentials
       const authResponse = await fetch(
-        'http://localhost:4000/api/imagekit/auth',
+        'https://stayintouch-server.onrender.com/api/imagekit/auth',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -312,7 +312,7 @@ const ChatBox = () => {
         const imageUrl = await uploadImage(image)
 
         const response = await fetch(
-          'http://localhost:4000/api/messages',
+          'https://stayintouch-server.onrender.com/api/messages',
           {
             method: 'POST',
 
@@ -366,7 +366,7 @@ const ChatBox = () => {
       const trimmedText = text.trim()
 
       const response = await fetch(
-        'http://localhost:4000/api/messages',
+        'https://stayintouch-server.onrender.com/api/messages',
         {
           method: 'POST',
 

@@ -34,7 +34,7 @@ const Feed = () => {
       const token = await getToken();
 
       const response = await fetch(
-        'http://localhost:4000/api/posts',
+        'https://stayintouch-server.onrender.com/api/posts',
         {
           headers: {
             Authorization: `Bearer ${token}`,

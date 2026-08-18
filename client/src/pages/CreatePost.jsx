@@ -26,7 +26,7 @@ const CreatePost = () => {
         const token = await getToken();
 
         const response = await fetch(
-          'http://localhost:4000/api/users/me',
+          'https://stayintouch-server.onrender.com/api/users/me',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ const CreatePost = () => {
 
       // Get secure ImageKit upload credentials
       const authResponse = await fetch(
-        'http://localhost:4000/api/imagekit/auth',
+        'https://stayintouch-server.onrender.com/api/imagekit/auth',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -170,7 +170,7 @@ const CreatePost = () => {
       // =========================
 
       const response = await fetch(
-        'http://localhost:4000/api/posts',
+        'https://stayintouch-server.onrender.com/api/posts',
         {
           method: 'POST',
 

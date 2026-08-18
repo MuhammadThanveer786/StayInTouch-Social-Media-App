@@ -36,7 +36,7 @@ const UserCard = ({ user }) => {
         // ---------------------------------------------
 
         const userResponse = await fetch(
-          'http://localhost:4000/api/users/me',
+          'https://stayintouch-server.onrender.com/api/users/me',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -60,7 +60,7 @@ const UserCard = ({ user }) => {
         // ---------------------------------------------
 
         const connectionResponse = await fetch(
-          'http://localhost:4000/api/connections',
+          'https://stayintouch-server.onrender.com/api/connections',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -129,7 +129,7 @@ const UserCard = ({ user }) => {
         : 'POST'
 
       const response = await fetch(
-        `http://localhost:4000/api/users/${user._id}/follow`,
+        `https://stayintouch-server.onrender.com/api/users/${user._id}/follow`,
         {
           method,
           headers: {
@@ -194,7 +194,7 @@ const UserCard = ({ user }) => {
       const token = await getToken()
 
       const response = await fetch(
-        `http://localhost:4000/api/connections/request/${user._id}`,
+        `https://stayintouch-server.onrender.com/api/connections/request/${user._id}`,
         {
           method: 'POST',
 
